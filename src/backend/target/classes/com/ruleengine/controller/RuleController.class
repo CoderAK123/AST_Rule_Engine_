@@ -1,0 +1,65 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package com.ruleengine.controller;
+
+import com.ruleengine.model.Rule;
+import com.ruleengine.model.UserData;
+import com.ruleengine.repository.RuleRepository;
+import com.ruleengine.service.RuleEvaluator;
+import com.ruleengine.service.RuleParser;
+import java.util.List;
+import lombok.Generated;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping({"/api/rules"})
+@CrossOrigin(
+   origins = {"*"}
+)
+public class RuleController {
+   private final RuleRepository ruleRepository;
+   private final RuleParser ruleParser;
+   private final RuleEvaluator ruleEvaluator;
+
+   @GetMapping
+   public List<Rule> getAllRules() {
+      return this.ruleRepository.findAll();
+   }
+
+   @PostMapping
+   public Rule createRule(@RequestBody Rule rule) {
+      rule.setAst(this.ruleParser.parse(rule.getRuleString()));
+      return (Rule)this.ruleRepository.save(rule);
+   }
+
+   @PostMapping({"/{id}/evaluate"})
+   public ResponseEntity<Boolean> evaluateRule(@PathVariable Long id, @RequestBody UserData userData) {
+      return (ResponseEntity)this.ruleRepository.findById(id).map((rule) -> {
+         return ResponseEntity.ok(this.ruleEvaluator.evaluate(rule.getAst(), userData));
+      }).orElse(ResponseEntity.notFound().build());
+   }
+
+   @DeleteMapping({"/{id}"})
+   public ResponseEntity<Void> deleteRule(@PathVariable Long id) {
+      if (!this.ruleRepository.existsById(id)) {
+         return ResponseEntity.notFound().build();
+      } else {
+         this.ruleRepository.deleteById(id);
+         return ResponseEntity.ok().build();
+      }
+   }
+
+   @Generated
+   public RuleController(final RuleRepository ruleRepository, final RuleParser ruleParser, final RuleEvaluator ruleEvaluator) {
+      this.ruleRepository = ruleRepository;
+      this.ruleParser = ruleParser;
+      this.ruleEvaluator = ruleEvaluator;
+   }
+}

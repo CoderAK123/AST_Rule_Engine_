@@ -1,0 +1,111 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package com.ruleengine.model;
+
+import lombok.Generated;
+
+public class UserData {
+   private int age;
+   private String department;
+   private double salary;
+   private int experience;
+
+   @Generated
+   public int getAge() {
+      return this.age;
+   }
+
+   @Generated
+   public String getDepartment() {
+      return this.department;
+   }
+
+   @Generated
+   public double getSalary() {
+      return this.salary;
+   }
+
+   @Generated
+   public int getExperience() {
+      return this.experience;
+   }
+
+   @Generated
+   public void setAge(final int age) {
+      this.age = age;
+   }
+
+   @Generated
+   public void setDepartment(final String department) {
+      this.department = department;
+   }
+
+   @Generated
+   public void setSalary(final double salary) {
+      this.salary = salary;
+   }
+
+   @Generated
+   public void setExperience(final int experience) {
+      this.experience = experience;
+   }
+
+   @Generated
+   public boolean equals(final Object o) {
+      if (o == this) {
+         return true;
+      } else if (!(o instanceof UserData)) {
+         return false;
+      } else {
+         UserData other = (UserData)o;
+         if (!other.canEqual(this)) {
+            return false;
+         } else if (this.getAge() != other.getAge()) {
+            return false;
+         } else if (Double.compare(this.getSalary(), other.getSalary()) != 0) {
+            return false;
+         } else if (this.getExperience() != other.getExperience()) {
+            return false;
+         } else {
+            Object this$department = this.getDepartment();
+            Object other$department = other.getDepartment();
+            if (this$department == null) {
+               if (other$department != null) {
+                  return false;
+               }
+            } else if (!this$department.equals(other$department)) {
+               return false;
+            }
+
+            return true;
+         }
+      }
+   }
+
+   @Generated
+   protected boolean canEqual(final Object other) {
+      return other instanceof UserData;
+   }
+
+   @Generated
+   public int hashCode() {
+      int PRIME = true;
+      int result = 1;
+      result = result * 59 + this.getAge();
+      long $salary = Double.doubleToLongBits(this.getSalary());
+      result = result * 59 + (int)($salary ^ $salary >>> 32);
+      result = result * 59 + this.getExperience();
+      Object $department = this.getDepartment();
+      result = result * 59 + ($department == null ? 43 : $department.hashCode());
+      return result;
+   }
+
+   @Generated
+   public String toString() {
+      int var10000 = this.getAge();
+      return "UserData(age=" + var10000 + ", department=" + this.getDepartment() + ", salary=" + this.getSalary() + ", experience=" + this.getExperience() + ")";
+   }
+
+   @Generated
+   public UserData() {
+   }
+}

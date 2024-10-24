@@ -1,0 +1,103 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package com.ruleengine.service;
+
+import com.ruleengine.model.ASTNode;
+import com.ruleengine.model.UserData;
+import org.springframework.stereotype.Service;
+
+@Service
+public class RuleEvaluator {
+   public RuleEvaluator() {
+   }
+
+   public boolean evaluate(ASTNode node, UserData data) {
+      boolean var13;
+      if (node.getType().equals("operator")) {
+         boolean leftResult = this.evaluate(node.getLeft(), data);
+         boolean rightResult = this.evaluate(node.getRight(), data);
+         switch (node.getOperator()) {
+            case "OR":
+               var13 = leftResult || rightResult;
+               return var13;
+            case "AND":
+               var13 = leftResult && rightResult;
+               return var13;
+         }
+
+         throw new IllegalArgumentException("Unknown operator: " + node.getOperator());
+      } else if (!node.getType().equals("operand")) {
+         throw new IllegalArgumentException("Invalid node type: " + node.getType());
+      } else {
+         Object var10000;
+         label123: {
+            switch (node.getField()) {
+               case "salary":
+                  var10000 = data.getSalary();
+                  break label123;
+               case "experience":
+                  var10000 = data.getExperience();
+                  break label123;
+               case "age":
+                  var10000 = data.getAge();
+                  break label123;
+               case "department":
+                  var10000 = data.getDepartment();
+                  break label123;
+            }
+
+            throw new IllegalArgumentException("Unknown field: " + node.getField());
+         }
+
+         Object fieldValue = var10000;
+         nodeValue = node.getValue();
+         if (!(fieldValue instanceof Number)) {
+            return node.getOperator().equals("=") && fieldValue.toString().equals(nodeValue);
+         } else {
+            double numericFieldValue = ((Number)fieldValue).doubleValue();
+            double numericNodeValue = Double.parseDouble(nodeValue.toString());
+            String var10;
+            switch ((var10 = node.getOperator()).hashCode()) {
+               case 60:
+                  if (!var10.equals("<")) {
+                     throw new IllegalArgumentException("Unknown operator: " + node.getOperator());
+                  }
+
+                  var13 = numericFieldValue < numericNodeValue;
+                  break;
+               case 61:
+                  if (!var10.equals("=")) {
+                     throw new IllegalArgumentException("Unknown operator: " + node.getOperator());
+                  }
+
+                  var13 = numericFieldValue == numericNodeValue;
+                  break;
+               case 62:
+                  if (!var10.equals(">")) {
+                     throw new IllegalArgumentException("Unknown operator: " + node.getOperator());
+                  }
+
+                  var13 = numericFieldValue > numericNodeValue;
+                  break;
+               case 1921:
+                  if (!var10.equals("<=")) {
+                     throw new IllegalArgumentException("Unknown operator: " + node.getOperator());
+                  }
+
+                  var13 = numericFieldValue <= numericNodeValue;
+                  break;
+               case 1983:
+                  if (var10.equals(">=")) {
+                     var13 = numericFieldValue >= numericNodeValue;
+                     break;
+                  }
+
+                  throw new IllegalArgumentException("Unknown operator: " + node.getOperator());
+               default:
+                  throw new IllegalArgumentException("Unknown operator: " + node.getOperator());
+            }
+
+            return var13;
+         }
+      }
+   }
+}

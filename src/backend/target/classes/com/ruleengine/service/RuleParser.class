@@ -1,0 +1,117 @@
+// Source code is decompiled from a .class file using FernFlower decompiler.
+package com.ruleengine.service;
+
+import com.ruleengine.model.ASTNode;
+import org.springframework.stereotype.Service;
+
+@Service
+public class RuleParser {
+   private int pos = 0;
+   private String input = "";
+
+   public RuleParser() {
+   }
+
+   public ASTNode parse(String ruleString) {
+      this.pos = 0;
+      this.input = ruleString.trim();
+      return this.parseExpression();
+   }
+
+   private ASTNode parseExpression() {
+      ASTNode node;
+      ASTNode newNode;
+      for(node = this.parseTerm(); this.pos < this.input.length(); node = newNode) {
+         String operator = this.consumeOperator();
+         if (operator == null) {
+            break;
+         }
+
+         ASTNode right = this.parseTerm();
+         newNode = new ASTNode();
+         newNode.setType("operator");
+         newNode.setOperator(operator);
+         newNode.setLeft(node);
+         newNode.setRight(right);
+      }
+
+      return node;
+   }
+
+   private ASTNode parseTerm() {
+      this.consumeWhitespace();
+      if (this.input.charAt(this.pos) == '(') {
+         ++this.pos;
+         ASTNode node = this.parseExpression();
+         ++this.pos;
+         return node;
+      } else {
+         String field = this.consumeIdentifier();
+         String operator = this.consumeOperator();
+         String value = this.consumeValue();
+         ASTNode node = new ASTNode();
+         node.setType("operand");
+         node.setField(field);
+         node.setOperator(operator);
+         node.setValue(value);
+         return node;
+      }
+   }
+
+   private void consumeWhitespace() {
+      while(this.pos < this.input.length() && Character.isWhitespace(this.input.charAt(this.pos))) {
+         ++this.pos;
+      }
+
+   }
+
+   private String consumeIdentifier() {
+      this.consumeWhitespace();
+
+      StringBuilder identifier;
+      for(identifier = new StringBuilder(); this.pos < this.input.length() && (Character.isLetterOrDigit(this.input.charAt(this.pos)) || this.input.charAt(this.pos) == '_'); ++this.pos) {
+         identifier.append(this.input.charAt(this.pos));
+      }
+
+      return identifier.toString();
+   }
+
+   private String consumeOperator() {
+      this.consumeWhitespace();
+      String[] operators = new String[]{"AND", "OR", ">", "<", "=", ">=", "<="};
+      String[] var5 = operators;
+      int var4 = operators.length;
+
+      for(int var3 = 0; var3 < var4; ++var3) {
+         String op = var5[var3];
+         if (this.input.startsWith(op, this.pos)) {
+            this.pos += op.length();
+            return op;
+         }
+      }
+
+      return null;
+   }
+
+   private String consumeValue() {
+      this.consumeWhitespace();
+      StringBuilder value = new StringBuilder();
+      if (this.input.charAt(this.pos) == '\'') {
+         ++this.pos;
+
+         while(this.pos < this.input.length() && this.input.charAt(this.pos) != '\'') {
+            value.append(this.input.charAt(this.pos));
+            ++this.pos;
+         }
+
+         ++this.pos;
+      } else {
+         while(this.pos < this.input.length() && Character.isDigit(this.input.charAt(this.pos))) {
+            value.append(this.input.charAt(this.pos));
+            ++this.pos;
+         }
+      }
+
+      return value.toString();
+   }
+}
